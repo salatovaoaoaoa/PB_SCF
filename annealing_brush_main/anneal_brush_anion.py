@@ -328,19 +328,25 @@ def annealing_anion(
             for i in range(len(z_in_range))
         ]
     )
+    
+    if file_name is None:
+        parse_SCF_psi = 0
+        parse_SCF_phi = 0
+        f_ion_SCF = 0
+        charge_SCF = 0
+    else:
+        # Профили SCF
 
-    # Профили SCF
+        # NAMICS
+        parse_SCF_psi = pd.read_csv(file_name, sep="\t")["sys_noname_psi"][
+            minus_layers : round(H) + 20
+        ]
+        parse_SCF_phi = pd.read_csv(file_name, sep="\t")["mol_brush_phi"][minus_layers : round(H) + 20]
 
-    # NAMICS
-    parse_SCF_psi = pd.read_csv(file_name, sep="\t")["sys_noname_psi"][
-        minus_layers : round(H) + 20
-    ]
-    parse_SCF_phi = pd.read_csv(file_name, sep="\t")["mol_brush_phi"][minus_layers : round(H) + 20]
-
-    f_ion_SCF = delta_F_ion(
-        parse_SCF_psi, alpha_buf_plus_fast(), alpha_buf_minus_fast()
-    )
-    charge_SCF = Q_exp(alpha_buf_plus_fast(), alpha_buf_minus_fast(), parse_SCF_psi)
+        f_ion_SCF = delta_F_ion(
+            parse_SCF_psi, alpha_buf_plus_fast(), alpha_buf_minus_fast()
+        )
+        charge_SCF = Q_exp(alpha_buf_plus_fast(), alpha_buf_minus_fast(), parse_SCF_psi)
 
     # РАСЧЕТ ОСМОТИЧЕСКОГО И ОБЪЕМНОГО ВКЛАДОВ
 
@@ -376,10 +382,6 @@ def annealing_anion(
 
     F_full_SCF = f_ion_SCF + F_vol_SCF + F_osm_SCF
 
-    # #Заряд белка вне щетки
-
-    # Q_mean = charge_out[-1]
-
     return (
         H,
         alpha_H,
@@ -403,12 +405,7 @@ def annealing_anion(
         parse_SCF_psi,
         parse_SCF_phi,
         polymer_dens_anneal,
-        F_osm,
-        F_vol_in,
-        F_vol_out,
         F_full_theory_in,
         F_full_theory_out,
-        F_osm_SCF,
-        F_vol_SCF,
         F_full_SCF,
     )

@@ -281,10 +281,10 @@ def anneal_brush_cation(
             / (alpha_buf_minus_fast + (1 - alpha_buf_minus_fast) * np.exp(-1 * psi))
         )
 
-    f_ion_in = delta_F_ion(
+    f_ion_in_cation = delta_F_ion(
         psi_in_z(z_in_range_cation), alpha_buf_plus_fast(), alpha_buf_minus_fast()
     )
-    f_ion_out = delta_F_ion(
+    f_ion_out_cation = delta_F_ion(
         psi_out_z(z_out_range_cation), alpha_buf_plus_fast(), alpha_buf_minus_fast()
     )
 
@@ -326,19 +326,26 @@ def anneal_brush_cation(
             for i in range(len(z_in_range_cation))
         ]
     )
+    
+    if file_name is None:
+        parse_SCF_psi_cation = 0
+        parse_SCF_phi_cation = 0
+        f_ion_SCF_cation = 0
+        charge_SCF_cation = 0
+    else:
 
-    # Профили SCF
+        # Профили SCF
 
-    # NAMICS
-    parse_SCF_psi_cation = pd.read_csv(file_name, sep="\t")["sys_noname_psi"][
-        minus_layers : round(H_cation) + 20
-    ]
-    parse_SCF_phi_cation = pd.read_csv(file_name, sep="\t")["mol_brush_phi"][minus_layers : round(H_cation) + 20]
+        # NAMICS
+        parse_SCF_psi_cation = pd.read_csv(file_name, sep="\t")["sys_noname_psi"][
+            minus_layers : round(H_cation) + 20
+        ]
+        parse_SCF_phi_cation = pd.read_csv(file_name, sep="\t")["mol_brush_phi"][minus_layers : round(H_cation) + 20]
 
-    f_ion_SCF = delta_F_ion(
-        parse_SCF_psi_cation, alpha_buf_plus_fast(), alpha_buf_minus_fast()
-    )
-    charge_SCF = Q_exp(alpha_buf_plus_fast(), alpha_buf_minus_fast(), parse_SCF_psi_cation)
+        f_ion_SCF_cation = delta_F_ion(
+            parse_SCF_psi_cation, alpha_buf_plus_fast(), alpha_buf_minus_fast()
+        )
+        charge_SCF = Q_exp(alpha_buf_plus_fast(), alpha_buf_minus_fast(), parse_SCF_psi_cation)
 
     # РАСЧЕТ ОСМОТИЧЕСКОГО И ОБЪЕМНОГО ВКЛАДОВ
 
@@ -350,29 +357,29 @@ def anneal_brush_cation(
 
         #  ОСМОТИЧЕСКИЙ ВКЛАД В СВОБОДНУЮ ЭНЕРГИЮ (ТЕОРИЯ)
 
-    F_osm = f_osmotic(polymer_dens_anneal_cation)
+    F_osm_cation = f_osmotic(polymer_dens_anneal_cation)
 
     # ВКЛАД В СВОБОДНУЮ ЭНЕРГИЮ ОТ БЕЛКА (ТЕОРИЯ)
 
-    F_vol_in = f_volume_protein(psi_in_cation)
-    F_vol_out = f_volume_protein(psi_out_cation)
+    F_vol_in_cation = f_volume_protein(psi_in_cation)
+    F_vol_out_cation = f_volume_protein(psi_out_cation)
 
     # ПОЛНАЯ СВОБОДНАЯ ЭНЕРГИЯ (ТЕОРИЯ)
 
-    F_full_theory_in = f_ion_in + F_vol_in + F_osm
-    F_full_theory_out = f_ion_out + F_vol_out
+    F_full_theory_in_cation = f_ion_in_cation + F_vol_in_cation + F_osm_cation
+    F_full_theory_out_cation = f_ion_out_cation + F_vol_out_cation
 
     #  ОСМОТИЧЕСКИЙ ВКЛАД В СВОБОДНУЮ ЭНЕРГИЮ (SCF)
 
-    F_osm_SCF = f_osmotic(parse_SCF_phi_cation)
+    F_osm_SCF_cation = f_osmotic(parse_SCF_phi_cation)
 
     # ВКЛАД В СВОБОДНУЮ ЭНЕРГИЮ ОТ БЕЛКА (SCF)
 
-    F_vol_SCF = f_volume_protein(parse_SCF_psi_cation)
+    F_vol_SCF_cation = f_volume_protein(parse_SCF_psi_cation)
 
     # ПОЛНАЯ СВОБОДНАЯ ЭНЕРГИЯ (SCF)
 
-    F_full_SCF = f_ion_SCF + F_vol_SCF + F_osm_SCF
+    F_full_SCF_cation = f_ion_SCF_cation + F_vol_SCF_cation + F_osm_SCF_cation
 
     # #Заряд белка вне щетки
 
@@ -393,5 +400,17 @@ def anneal_brush_cation(
         psi_out_cation,
         polymer_dens_anneal_cation,
         parse_SCF_psi_cation,
-        parse_SCF_phi_cation
+        parse_SCF_phi_cation,
+        f_ion_in_cation,
+        f_ion_out_cation, 
+        F_vol_in_cation, 
+        F_vol_out_cation, 
+        F_osm_cation,
+        F_full_theory_in_cation, 
+        F_full_theory_out_cation,
+        
+        f_ion_SCF_cation,
+        F_osm_SCF_cation,
+        F_vol_SCF_cation,
+        F_full_SCF_cation 
     )

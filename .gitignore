@@ -1,6 +1,9 @@
 #files out
 
 **/*.out
+*.pro
+*.out
+*.in
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

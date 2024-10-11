@@ -29,7 +29,7 @@ def generate_in_files(
     chi: float = 0.5
 ):
 
-    # какие параметры меняем? TODO
+    # какие параметры меняем? TODO 
     change_param_annealing = delta_pK
     change_param_quenched = alpha_z_average
     
