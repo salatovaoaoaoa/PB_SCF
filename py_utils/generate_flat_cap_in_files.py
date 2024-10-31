@@ -22,6 +22,8 @@ def generate_flat_cap_in_files(template_cap: str = 'temp_surface.in',
                    alpha: float = 0.5,
                    min_range_value: float = 4,
                    max_range_value: float = 4,
+                   
+                   chi: float = 0.5,
                    ): 
     #какие параметры меняем?
     change_param = N_layers
@@ -58,6 +60,40 @@ def generate_flat_cap_in_files(template_cap: str = 'temp_surface.in',
             data[str] = f'mol : brush  : composition : (X0)1(A){N_brush - 2}(G)1\n'
         if 'mol : brush : theta' in data[str]:
             data[str] = f'mol : brush : theta : {theta}\n'
+    
+            
+    if alpha == 0:
+        lines_to_remove = [
+            'lat : flat : bondlength : 3e-10\n',
+            f'mon : X0 : chi_Na : {chi}\n',
+            f'mon : A : chi_Na : {chi}\n',
+            f'mon : G : chi_Na : {chi}\n',
+            f'mon : X0 : chi_Cl : {chi}\n',
+            f'mon : A : chi_Cl : {chi}\n',
+            f'mon : G : chi_Cl : {chi}\n',
+            f'mon : X0 : valence : {-alpha}\n',
+            f'mon : A : valence : {-alpha}\n',
+            f'mon : G : valence : {-alpha}\n',
+            'mon : Na : valence : 1\n',
+            'mon : Cl : valence : -1\n',
+            'mon : Na : freedom : free\n',
+            'mon : Cl : freedom : free\n',
+            'mol : Na : composition  : (Na)1\n',
+            'mol : Na : freedom : neutralizer\n',
+            'mol : Cl : composition : (Cl)1\n',
+            'mol : Cl : freedom : free\n',
+            f'mol : Cl : phibulk : {Cs}\n',
+            'pro : sys : noname : psi\n',
+        ]
+        data = [line for line in data if line not in lines_to_remove]
+        data.append('\n')
+        
+        data.append('lat : flat : upperbound : surface\n')
+        data.append('mon : S : freedom : frozen\n')
+        data.append('mon : S : frozen_range : upperbound\n')
+        data.append('mon : X0 : chi_S : -0.3\n')
+        data.append('mon : A : chi_S : -0.3\n')
+        data.append('mon : G : chi_S : -0.3\n')
         
 
     # Создаем папку в зависимости от значения change_param

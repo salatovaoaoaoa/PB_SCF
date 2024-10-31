@@ -4,6 +4,8 @@
 *.pro
 *.out
 *.in
+_*/
+FD*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

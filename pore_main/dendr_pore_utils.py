@@ -5,6 +5,7 @@ sys.path.append('/home/tpopova/prj/polymer_brush')
 from math import sqrt
 from math import exp
 from math import pi
+from math import atan
 
 import numpy as np 
 
@@ -17,32 +18,35 @@ from scipy.special import i1
 from scipy.special import k0 
 from scipy.special import k1 
 
-def pore_utils(S : float  = 100, #площадь поверхности поры на цепь
+'''Будем считать только симметричные дендроны g=1,2,3 поколений с функциональностью q=2'''
+
+def dendr_pore_utils(S : float  = 100,
               alpha : float = 0.5,
               Cs : float = 0.001,
-              a : float = 1,
               lb : float = 1,
+              a : float = 1,
               D : float = 300,
-              n : int = 10,
-              g: int = 0,
-              q: int = 1):
+              n : int = 50,
+              g: int = 1, 
+              q: int = 2):
+    
+    #  Расчет коэффициента k и N:
+    
+    if g == 1:
+        N = n * (1 + q)
+        k = n**(-1) * atan(1/sqrt(q))
+    if g == 2:
+        N = n * (1 + q + q**2)
+        k = n**(-1) * atan(1/sqrt(q*(q+2)))
+    if g == 3:
+        N = n * (1 + q + q**2 + q**3)
+        k = n**(-1) * atan(sqrt(((q**2 + 2*q + 3) - sqrt((q**2 + 2*q + 3)**2 - 4))/(2*q)))
     
     # inverse Debye length
     K: float = sqrt(8 * pi * lb * Cs)
     
-    """Линйный случай"""
-    
-    if g == 0 and q == 1:
-        N = n
-        key = pi/(2 * N)
-        
-        H_0: float = sqrt(2/3) * a * sqrt(alpha)/key
-        
-        
-    elif g == 2 and q == 2:
-        key = 1/n * np.arctan(1/np.sqrt(q * (q + 2)))
-        N = n * (1 + q + q**2)
-        H_0: float = sqrt(2/3) * a * sqrt(alpha)/key
+    # Characteristic length
+    H_0: float = sqrt((2*a**2)/ 3) * sqrt(alpha)/k
 
     #dzeta b
     zeta_b: float = (2 * pi * D * lb * alpha * N)/S
@@ -119,7 +123,7 @@ def pore_utils(S : float  = 100, #площадь поверхности поры
         
         rho = rho_in(r_in_range)
         
-        return H[0], K,  H_0, N, r_in_range, r_out_range, psi_in_range, psi_out_range, c_pol, rho, theta, K, t_lambda_answ
+        return N, H[0], r_in_range, r_out_range, psi_in_range, psi_out_range, c_pol, rho, theta, K, t_lambda_answ
     
     else:
         
@@ -157,5 +161,5 @@ def pore_utils(S : float  = 100, #площадь поверхности поры
     
     rho_cut = rho_in(r_in_range_cut)
         
-    return H_cut[0], K,  H_0, N, r_in_range_cut, r_out_range_cut, psi_in_range_cut, psi_out_range_cut, c_pol_cut, rho_cut, theta, K, t_lambda_answ_cut
+    return H_cut[0], r_in_range_cut, r_out_range_cut, psi_in_range_cut, psi_out_range_cut, c_pol_cut, rho_cut, theta, K, t_lambda_answ_cut
     

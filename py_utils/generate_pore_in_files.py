@@ -20,6 +20,8 @@ def generate_pore_in_files(template_pore: str = 'pore_temp.in',
                    D: float = 400,
                    min_range_value: float = 4,
                    max_range_value: float = 4,
+                   
+                   chi: float = 0.5,
                    ): 
     #какие параметры меняем?
     change_param = Cs
@@ -47,7 +49,42 @@ def generate_pore_in_files(template_pore: str = 'pore_temp.in',
             data[str] = f'mol : pol  : composition : (X0)1(A){N_brush - 2}(E)1\n'
         elif 'mol : pol : theta' in data[str]:
             data[str] = f'mol : pol : theta : {theta}\n'
+    
+    if alpha == 0:
+        lines_to_remove = [
+            'lat : 1G : bondlength : 3e-10\n',
+            f'mon : X0 : chi_Na : {chi}\n',
+            f'mon : A : chi_Na : {chi}\n',
+            f'mon : E : chi_Na : {chi}\n',
+            f'mon : X0 : chi_Cl : {chi}\n',
+            f'mon : A : chi_Cl : {chi}\n',
+            f'mon : E : chi_Cl : {chi}\n',
+            f'mon : X0 : valence : {-alpha}\n',
+            f'mon : A : valence : {-alpha}\n',
+            f'mon : E : valence : {-alpha}\n',
+            'mon : Na : valence : 1\n',
+            'mon : Cl : valence : -1\n',
+            'mon : Na : freedom : free\n',
+            'mon : Cl : freedom : free\n',
+            'mol : Na : composition  : (Na)1\n',
+            'mol : Na : freedom : neutralizer\n',
+            'mol : Cl : composition : (Cl)1\n',
+            'mol : Cl : freedom : free\n',
+            f'mol : Cl : phibulk : {Cs}\n',
+            'pro : sys : noname : psi\n',
+            'pro : mol : Cl : phi\n',
+            'pro : mol : Na : phi\n'
+        ]
+        data = [line for line in data if line not in lines_to_remove]
         
+        data.append('\n')
+        
+        data.append('lat : 1G : upperbound : surface\n')
+        data.append('mon : S : freedom : frozen\n')
+        data.append('mon : S : frozen_range : upperbound\n')
+        data.append('mon : X0 : chi_S : -0.5\n')
+        data.append('mon : A : chi_S : -0.5\n')
+        data.append('mon : E : chi_S : -0.5\n')
 
     # Создаем папку в зависимости от значения change_param
     folder_name = f'_pore_range_{range_param}_from_{min_range_value}_to_{max_range_value}'
