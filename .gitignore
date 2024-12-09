@@ -6,6 +6,7 @@
 *.in
 _*/
 FD*/
+surfRange*/
 
 #dict
 .vscode
