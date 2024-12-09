@@ -3,5 +3,9 @@
         "brentq",
         "dend",
         "tlambda"
+    ],
+    "python.analysis.extraPaths": [
+        "./charge_surf_2disp/py_files",
+        "./charge_surface/py_files"
     ]
 }
