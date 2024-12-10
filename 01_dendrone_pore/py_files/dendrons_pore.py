@@ -7,6 +7,7 @@ import numpy as np
 from math import sqrt
 from math import pi
 from math import atan
+from math import ceil
 
 from scipy.special import i0
 from scipy.special import i1
@@ -26,7 +27,8 @@ def dendrons_pore(
     #параметры дендрона
     g : int = 1,
     q : int = 1,
-    n : int = 10,
+    n_base : int = 10,
+    N_opt : int = None,
     
     #const
     lb : float = 1.0, 
@@ -34,22 +36,46 @@ def dendrons_pore(
 ):
     #Вычисляю коэффициент (coef) и общую N:
     
-    if g == 0:
-        N = n
-        coef = pi/(2 * N)
-    if g == 1:
-        coef = pow(n, -1) * atan(pow(q, -1/2))
-        N = n * (1 + q)
-    if g == 2:
-        coef = pow(n, -1) * atan(pow(q * (q + 2), -1/2))
-        N = n * (1 + q + pow(q, 2))
-    if g == 3:
-        equation = (
-            (pow(q, 2) + 2 * q + 3) - sqrt(pow(q**2 + 2*q + 3, 2) - 4)
-            )/(2 * q)
-        coef = pow(n, -1) * atan(pow(equation, 1/2))
-        N = n * (1 + q + pow(q, 2) + pow(q, 3))
-    
+    if N_opt is None:
+        if g == 0:
+            N = n_base
+            coef = pi/(2 * N)
+        if g == 1:
+            coef = pow(n_base, -1) * atan(pow(q, -1/2))
+            N = n_base * (1 + q)
+        if g == 2:
+            coef = pow(n_base, -1) * atan(pow(q * (q + 2), -1/2))
+            N = n_base * (1 + q + pow(q, 2))
+        if g == 3:
+            equation = (
+                (pow(q, 2) + 2 * q + 3) - sqrt(pow(q**2 + 2*q + 3, 2) - 4)
+                )/(2 * q)
+            coef = pow(n_base, -1) * atan(pow(equation, 1/2))
+            N = n_base * (1 + q + pow(q, 2) + pow(q, 3))
+    else:
+        if g == 0:
+            n = N_opt
+            N = N_opt
+            coef = pi/(2 * N)
+
+        if g == 1:
+            n = ceil(N_opt / (1 + q))
+            N = N_opt
+            coef = pow(n, -1) * atan(pow(q, -1/2))
+            
+        if g == 2:
+            n = ceil(N_opt / (1 + q + pow(q, 2)))
+            N = N_opt
+            coef = pow(n, -1) * atan(pow(q * (q + 2), -1/2))
+
+        if g == 3:
+            n = ceil(N_opt / (1 + q + pow(q, 2) + pow(q, 3)))
+            N = N_opt
+            equation = (
+                (pow(q, 2) + 2 * q + 3) - sqrt(pow(q**2 + 2*q + 3, 2) - 4)
+                )/(2 * q)
+            coef = pow(n, -1) * atan(pow(equation, 1/2))
+
     #Theta
     l = S/(2*pi*D)
     theta = N/l
@@ -132,4 +158,4 @@ def dendrons_pore(
     
     rho_dendrons = rho_in(r_in_dendrons)
     
-    return N, theta, H_dendrons, r_in_dendrons, r_out_dendrons, psi_in_dendrons, psi_out_dendrons, c_pol_dendrons, rho_dendrons
+    return N, n, theta, H_dendrons, r_in_dendrons, r_out_dendrons, psi_in_dendrons, psi_out_dendrons, c_pol_dendrons, rho_dendrons

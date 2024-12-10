@@ -47,6 +47,8 @@ def create_in(
             data[str] = f'mon : P : chi_W : {chi}\n'
         elif 'mon : E : chi_W' in data[str]:
             data[str] = f'mon : E : chi_W : {chi}\n'
+        elif 'mon : EL : chi_W' in data[str]:
+            data[str] = f'mon : EL : chi_W : {chi}\n'
         
         #chi для натрия
         elif 'mon : P0 : chi_Na' in data[str]:
@@ -55,6 +57,8 @@ def create_in(
             data[str] = f'mon : P : chi_Na : {chi}\n'
         elif 'mon : E : chi_Na' in data[str]:
             data[str] = f'mon : E : chi_Na : {chi}\n'
+        elif 'mon : EL : chi_Na' in data[str]:
+            data[str] = f'mon : EL : chi_Na : {chi}\n'
         
         #chi для Cl
         elif 'mon : P0 : chi_Cl' in data[str]:
@@ -63,6 +67,8 @@ def create_in(
             data[str] = f'mon : P : chi_Cl : {chi}\n'
         elif 'mon : E : chi_Cl' in data[str]:
             data[str] = f'mon : E : chi_Cl : {chi}\n'
+        elif 'mon : EL : chi_Cl' in data[str]:
+            data[str] = f'mon : EL : chi_Cl : {chi}\n'
             
         # Валентность
         
@@ -72,6 +78,8 @@ def create_in(
             data[str] = f'mon : P : valence : {-alpha}\n'
         elif 'mon : E : valence' in data[str]:
             data[str] = f'mon : E : valence : {-alpha}\n'
+        elif 'mon : EL : valence' in data[str]:
+            data[str] = f'mon : EL : valence : {-alpha}\n'
         
         # Соль
         elif 'mol : Cl : phibulk' in data[str]:
@@ -97,6 +105,7 @@ def create_in(
             f'mon : P0 : valence : {-alpha}\n'
             f'mon : P : valence : {-alpha}\n'
             f'mon : E : valence : {-alpha}\n'
+            f'mon : EL : valence : {-alpha}\n'
             'mon : Na : valence : 1\n',
             'mon : Cl : valence : -1\n',
             'mon : Na : freedom : free\n',
@@ -118,6 +127,7 @@ def create_in(
         data.append('mon : P0 : chi_S : -0.5\n')
         data.append('mon : P : chi_S : -0.5\n')
         data.append('mon : E : chi_S : -0.5\n')
+        data.append('mon : EL : chi_S : -0.5\n')
 
     # Создаем папку в зависимости от значения change_param
     

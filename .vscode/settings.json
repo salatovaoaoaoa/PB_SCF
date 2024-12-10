@@ -6,6 +6,7 @@
     ],
     "python.analysis.extraPaths": [
         "./charge_surf_2disp/py_files",
-        "./charge_surface/py_files"
+        "./charge_surface/py_files",
+        "./01_dendrone_pore/py_files"
     ]
 }
