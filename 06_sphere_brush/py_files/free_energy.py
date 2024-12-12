@@ -16,6 +16,7 @@ def free_energy(
     psi = pd.read_csv(file, sep='\t')['sys_noname_psi']
     phi_brush = pd.read_csv(file, sep='\t')['mol_pol_phi']
     phi_end = pd.read_csv(file, sep='\t')['mon_E_phi']
+    r_range = np.arange(len(phi_brush))
     
     #Считаем свободную энергию
     
@@ -57,4 +58,4 @@ def free_energy(
                                alpha_buf_minus_exp(d_pH_b, pH_iep_in_quen, PK_MINUS),
                       psi)
     
-    return psi, phi_brush, phi_end, f_ion_SCF_quen, Q_SCF_quen, pH_iep_in_quen, d_pH_b
+    return psi, phi_brush,r_range,  phi_end, f_ion_SCF_quen, Q_SCF_quen, pH_iep_in_quen, d_pH_b
