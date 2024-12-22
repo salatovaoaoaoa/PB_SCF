@@ -21,6 +21,7 @@ def create_in(
     N : int = 30,
     S : float = 100.0,
     alpha : float = 0.5,
+    Kuhn : str = '7e-09',
     
     ):
 
@@ -37,6 +38,11 @@ def create_in(
         #Число слоев
         if 'lat : flat : n_layers' in data[str]:
             data[str] = f'lat : flat : n_layers : {N_layers}\n'
+        
+        # сегмент Куна
+        
+        elif 'lat : flat : bondlength' in data[str]:
+            data[str] = f'lat : flat : bondlength : {Kuhn}\n'
         
         #chi для поверхности
         elif 'mon : X0 : chi_S' in data[str]:
@@ -73,15 +79,15 @@ def create_in(
         # Валентность
         
         elif 'mon : X0 : valence' in data[str]:
-            data[str] = f'mon : X0 : valence : {-alpha}\n'
+            data[str] = f'mon : X0 : valence : {alpha}\n'
         elif 'mon : A : valence' in data[str]:
-            data[str] = f'mon : A : valence : {-alpha}\n'
+            data[str] = f'mon : A : valence : {alpha}\n'
         elif 'mon : G : valence' in data[str]:
-            data[str] = f'mon : G : valence : {-alpha}\n'
+            data[str] = f'mon : G : valence : {alpha}\n'
         
         # Соль
-        elif 'mol : Cl : phibulk' in data[str]:
-            data[str] = f'mol : Cl : phibulk : {Cs}\n'
+        elif 'mol : Na : phibulk' in data[str]:
+            data[str] = f'mol : Na : phibulk : {Cs}\n'
         
         #Композиция полимера
         elif 'mol : brush  : composition' in data[str]:
@@ -93,25 +99,26 @@ def create_in(
 
     if alpha == 0:
         lines_to_remove = [
-            'lat : flat : bondlength : 3e-10\n',
+            f'mon : W: epsilon : 80\n',
+            f'lat : flat : bondlength : {Kuhn}\n',
             f'mon : X0 : chi_Na : {chi}\n',
             f'mon : A : chi_Na : {chi}\n',
             f'mon : G : chi_Na : {chi}\n',
             f'mon : X0 : chi_Cl : {chi}\n',
             f'mon : A : chi_Cl : {chi}\n',
             f'mon : G : chi_Cl : {chi}\n',
-            f'mon : X0 : valence : {-alpha}\n',
-            f'mon : A : valence : {-alpha}\n',
-            f'mon : G : valence : {-alpha}\n',
+            f'mon : X0 : valence : {alpha}\n',
+            f'mon : A : valence : {alpha}\n',
+            f'mon : G : valence : {alpha}\n',
             'mon : Na : valence : 1\n',
             'mon : Cl : valence : -1\n',
-            'mon : Na : freedom : free\n',
+            'mol : Na : freedom : free\n',
             'mon : Cl : freedom : free\n',
-            'mol : Na : composition  : (Na)1\n',
-            'mol : Na : freedom : neutralizer\n',
-            'mol : Cl : composition : (Cl)1\n',
+            'mol : Na : composition : (Na)1\n',
+            'mol : Cl : freedom : neutralizer\n',
+            'mol : Cl : composition  : (Cl)1\n',
             'mol : Cl : freedom : free\n',
-            f'mol : Cl : phibulk : {Cs}\n',
+            f'mol : Na : phibulk : {Cs}\n',
             'pro : sys : noname : psi\n',
         ]
         data = [line for line in data if line not in lines_to_remove]
