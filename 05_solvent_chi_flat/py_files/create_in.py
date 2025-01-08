@@ -15,6 +15,7 @@ def create_in(
     
     Cs : float = 0.001,
     chi :float = 0.5,
+    chi_ions : float = 0.5,
     chi_surf : float = -0.6,
     
     N_layers : int = 200,
@@ -62,19 +63,19 @@ def create_in(
         
         #chi для натрия
         elif 'mon : X0 : chi_Na' in data[str]:
-            data[str] = f'mon : X0 : chi_Na : {chi}\n'
+            data[str] = f'mon : X0 : chi_Na : {chi_ions}\n'
         elif 'mon : A : chi_Na' in data[str]:
-            data[str] = f'mon : A : chi_Na : {chi}\n'
+            data[str] = f'mon : A : chi_Na : {chi_ions}\n'
         elif 'mon : G : chi_Na' in data[str]:
-            data[str] = f'mon : G : chi_Na : {chi}\n'
+            data[str] = f'mon : G : chi_Na : {chi_ions}\n'
         
         #chi для Cl
         elif 'mon : X0 : chi_Cl' in data[str]:
-            data[str] = f'mon : X0 : chi_Cl : {chi}\n'
+            data[str] = f'mon : X0 : chi_Cl : {chi_ions}\n'
         elif 'mon : A : chi_Cl' in data[str]:
-            data[str] = f'mon : A : chi_Cl : {chi}\n'
+            data[str] = f'mon : A : chi_Cl : {chi_ions}\n'
         elif 'mon : G : chi_Cl' in data[str]:
-            data[str] = f'mon : G : chi_Cl : {chi}\n'
+            data[str] = f'mon : G : chi_Cl : {chi_ions}\n'
             
         # Валентность
         
