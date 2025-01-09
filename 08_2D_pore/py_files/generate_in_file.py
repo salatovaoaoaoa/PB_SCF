@@ -1,4 +1,19 @@
-def generate_in_file(filename, D = 100, L_pore = 100, N = 300, theta = 1130):
+from math import pi
+
+def generate_in_file(filename,
+                     D : int = 20,
+                     L_pore : int = 10,
+                     L_wall : int = 20,
+                     space : int = 10,
+                     N : int = 50,
+                     S : int = 70,
+                     Cs : float = 0.01,
+                     valence : float = -0.5, 
+                     chi_surf : float = -0.55,
+                     chi_solv : float = 0.5):
+    
+    theta = 2 * pi * D * N * (1/S)
+    
     with open(filename, 'w') as file:
         # Начальное содержимое
         file.write(f"""lat : cyl : geometry : cylindrical
@@ -7,14 +22,12 @@ lat : cyl : gradients : 2
 lat : cyl : lattice_type : simple_cubic
 lat : cyl : bondlength : 3e-10
 
-lat : cyl : n_layers_x : {D * 1.3}
-lat : cyl : n_layers_y : {L_pore + 2 * L_pore * 0.3}
+lat : cyl : n_layers_x : {int(D + L_wall)}
+lat : cyl : n_layers_y : {int(L_pore + 2 * space)}
 
-//surface
-lat : cyl : upperbound_y : surface
+//surface #2
 mon : S : freedom : frozen
-mon : S : frozen_range : 22,31;24,70
-//mon : S : frozen_range : upperbound_y
+mon : S : frozen_range : {int(D + 1)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}
 
 //monomers
 
@@ -22,21 +35,21 @@ mon : W : freedom : free
 mon : A : freedom : free
 mon : E : freedom : free
 
-mon : A : valence : -0.5
-mon : E : valence : -0.5
+mon : A : valence : {valence}
+mon : E : valence : {valence}
 
 // chi
-mon : A : chi_S : -0.55
-mon : E : chi_S : -0.55
+mon : A : chi_S : {chi_surf}
+mon : E : chi_S : {chi_surf}
 
-mon : A : chi_W : 0.5
-mon : E : chi_W : 0.5
+mon : A : chi_W : {chi_solv}
+mon : E : chi_W : {chi_solv}
 
-mon : A : chi_Na : 0.5
-mon : E : chi_Na : 0.5
+mon : A : chi_Na : {chi_solv}
+mon : E : chi_Na : {chi_solv}
 
-mon : A : chi_Cl : 0.5
-mon : E : chi_Cl : 0.5
+mon : A : chi_Cl : {chi_solv}
+mon : E : chi_Cl : {chi_solv}
 
 //solution
 
@@ -54,7 +67,7 @@ mol : Na : freedom : neutralizer
 
 mol : Cl : composition : (Cl)1
 mol : Cl : freedom : free
-mol : Cl : phibulk : 0.008s
+mol : Cl : phibulk : {Cs}
 
 //output
 
@@ -71,8 +84,7 @@ newton : isaac : deltamax : 0.1
 
 // chains
 """)
-
-        # Генерация блоков от pol0 до pol39 (длина поры - 1)
+        # Генерация блоков pol
         for i in range(0, L_pore):
             block = f"""
 //chain{i}
@@ -82,17 +94,25 @@ mol : pol{i} : theta : {theta}
 
 pro : mol : pol{i} : phi
 
-mon : X{i} : chi_S : -0.55
-mon : X{i} : chi_W : 0.5
-mon : X{i} : chi_Cl : 0.5
-mon : X{i} : chi_Na : 0.5
+mon : X{i} : chi_S : {chi_surf}
+mon : X{i} : chi_W : {chi_solv}
+mon : X{i} : chi_Cl : {chi_solv}
+mon : X{i} : chi_Na : {chi_solv}
 
-mon : X{i} : valence : -0.5
+mon : X{i} : valence : {valence}
 mon : X{i} : freedom : pinned
-mon : X{i} : pinned_range : {D+1},{L_pore * 0.3 + 1 + i};{D+1},{L_pore * 0.3 + 1 + i}
+mon : X{i} : pinned_range : {D},{int(space + 1 + i)};{D},{int(space + 1 + i)}
 //chain{i}
 """
             file.write(block)
+
+            
+# Для поверхности доп:
+# //surface #1
+# //lat : cyl : upperbound_y : surface
+# //mon : S : freedom : frozen
+# //mon : S : frozen_range : {int(D)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}
+# //mon : S : frozen_range : upperbound_y
 
 # Генерация файла
 generate_in_file("2d_pore.in")
