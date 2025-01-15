@@ -1,0 +1,15 @@
+range_param: "Cs"
+min_val : 0.5
+max_val : 0.5
+output_dir: "2D_pore_in_files"
+target_dir: "/home/tpopova/prj/PB_SCF/08_2D_pore/scf_templates"
+D: 10
+L_pore: 10
+L_wall: 10
+space: 10
+N: 10
+S: 100
+Cs: 0.01
+valence: -0.5
+chi_surf: -0.55
+chi_solv: 0.5

@@ -1,74 +1,80 @@
 import os
 import shutil
 from math import pi
+import logging
 
 def generate_in_file(
-    output_dir="2D_pore_in_files",  # Каталог для сохранения файлов
-    target_dir="/home/tpopova/prj/PB_SCF/08_2D_pore/scf_templates",  # Путь для перемещения
-    D: int = 20,
-    L_pore: int = 10,
-    L_wall: int = 20,
-    space: int = 10,
-    N: int = 50,
-    S: int = 70,
-    Cs: float = 0.01,
-    valence: float = -0.5, 
-    chi_surf: float = -0.55,
-    chi_solv: float = 0.5
+    range_param, min_val, max_val, output_dir, target_dir, D, L_pore, L_wall, space,
+    N, S, Cs, valence, chi_surf, chi_solv
 ):
-    # Создаём директорию, если её нет
-    os.makedirs(output_dir, exist_ok=True)
+    """
+    Генерирует файл входных данных для NAMICS и сохраняет его в указанный каталог.
     
+    :param range_param: Параметр диапазона, используется в названии файла.
+    :param min_val: Минимальное значение для диапазона.
+    :param max_val: Максимальное значение для диапазона.
+    :param output_dir: Директория для сохранения файла.
+    :param target_dir: Директория, куда переместить результат.
+    :param D: Радиус поры.
+    :param L_pore: Длина поры.
+    :param L_wall: Длина стенки.
+    :param space: отступы от поры.
+    :param N: Степень полимеризации
+    :param Cs: Концентрация соли.
+    :param valence: Заряд мономера.
+    :param chi_surf: качество растворителя.
+    :param chi_solv: качество растворителя.
+    :return: Путь к сгенерированному файлу.
+    """
+    # Создание выходной директории, если она не существует
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Вычисляем угол theta
     theta = 2 * pi * D * N * (1 / S)
 
     # Генерация имени файла
     base_filename = f"2D_v_{valence}_D_{D}_N_{N}_theta_{theta:.2f}.in"
-    
-    # Разделяем строку на части до и после последней точки
-    base_filename_parts = base_filename.rsplit('.', 1)
+    base_filename = base_filename.replace('.', '_', base_filename.count('.') - 1)
 
-    # Заменяем все точки на подчеркивания в первой части
-    base_filename_parts[0] = base_filename_parts[0].replace('.', '_')
-
-    # Собираем строку обратно, добавив точку между частями
-    base_filename = '.'.join(base_filename_parts)
-    
+    # Путь к файлу
     filename = os.path.join(output_dir, base_filename)
-    
-    with open(filename, 'w') as file:
-        # Общее для любого случая (заряженный или незаряженный)
-        file.write(f"""lat : cyl : geometry : cylindrical
+
+    try:
+        with open(filename, 'w') as file:
+            # Запись общих настроек
+            file.write(f"""lat : cyl : geometry : cylindrical
 lat : cyl : gradients : 2
-
 lat : cyl : lattice_type : simple_cubic
-
 lat : cyl : n_layers_x : {int(D + L_wall)}
-lat : cyl : n_layers_y : {int(L_pore + 2 * space)}
+lat : cyl : n_layers_y : {int(L_pore + 2 * space)}""")
 
+            # Генерация блоков для монологов
+            file.write(f"""
 //surface #2
 mon : S : freedom : frozen
-mon : S : frozen_range : {int(D + 1)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}
-
-//monomers
-
+mon : S : frozen_range : {int(D + 1)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}""")
+            
+            # Генерация блоков для молекул
+            file.write(f"""
 mon : W : freedom : free
 mon : A : freedom : free
-mon : E : freedom : free
-
-// chi
+mon : E : freedom : free""")
+            
+            # Запись chi значений
+            file.write(f"""
 mon : A : chi_S : {chi_surf}
 mon : E : chi_S : {chi_surf}
 
 mon : A : chi_W : {chi_solv}
-mon : E : chi_W : {chi_solv}
+mon : E : chi_W : {chi_solv}""")
 
-//solution
-
+            # Запись данных для раствора
+            file.write(f"""
 mol : water : composition : (W)1
-mol : water : freedom : solvent
+mol : water : freedom : solvent""")
 
-//output
-
+            # Запись output данных
+            file.write(f"""
 output : pro : append : false
 output : pro : write_bounds : false
 
@@ -79,11 +85,11 @@ newton : isaac : iterationlimit : 10000000
 newton : isaac : tolerance : 1e-8
 newton : isaac : deltamax : 0.1
 
-// chains
-""")
-        # Генерация блоков pol
-        for i in range(0, L_pore):
-            block = f"""
+// chains""")
+            
+            # Генерация цепочек
+            for i in range(0, L_pore):
+                block = f"""
 //chain{i}
 mol : pol{i} : composition : (X{i})1(A){N - 2}(E)1
 mol : pol{i} : freedom : restricted
@@ -98,10 +104,11 @@ mon : X{i} : freedom : pinned
 mon : X{i} : pinned_range : {D},{int(space + 1 + i)};{D},{int(space + 1 + i)}
 //chain{i}
 """
-            file.write(block)
+                file.write(block)
 
-        if valence != 0:
-            charge_append = f"""
+            # Если валентность не равна нулю, добавляем дополнительные блоки
+            if valence != 0:
+                charge_append = f"""
 lat : cyl : bondlength : 3e-10
 mon : A : valence : {valence}
 mon : E : valence : {valence}
@@ -110,6 +117,7 @@ mon : E : chi_Na : {chi_solv}
 
 mon : A : chi_Cl : {chi_solv}
 mon : E : chi_Cl : {chi_solv}
+
 mon : Na : valence : 1
 mon : Cl : valence : -1
 
@@ -124,30 +132,33 @@ mol : Cl : freedom : free
 mol : Cl : phibulk : {Cs}
 pro : sys : noname : psi
 """
-            file.write(charge_append)
-            
-            # Генерация блоков pol (charge Xi)
-            for i in range(0, L_pore):
-                block_charge = f"""
+                file.write(charge_append)
+
+                # Генерация блоков для зарядов Xi
+                for i in range(0, L_pore):
+                    block_charge = f"""
 //chain{i}
 mon : X{i} : chi_Cl : {chi_solv}
 mon : X{i} : chi_Na : {chi_solv}
 mon : X{i} : valence : {valence}
 //chain{i}
 """
-                file.write(block_charge)
-    
-    # Проверяем, существует ли уже папка
+                    file.write(block_charge)
+        
+        logging.info(f"Файл {base_filename} успешно создан в {output_dir}")
+    except Exception as e:
+        logging.error(f"Ошибка при создании файла {base_filename}: {e}")
+        raise
+
+    # Проверяем, существует ли уже папка в целевом каталоге
     target_folder = os.path.join(target_dir, os.path.basename(output_dir))
 
-    # Если папка существует, удаляем её
     if os.path.exists(target_folder):
         shutil.rmtree(target_folder)
 
-    # Перемещаем новую папку в целевой каталог
+    # Перемещаем выходную папку в целевой каталог
     shutil.move(output_dir, target_dir)
 
-    # Путь до файла
+    # Путь до сгенерированного файла
     file_in_path = os.path.join(target_dir, os.path.basename(output_dir), base_filename)
-    
     return file_in_path

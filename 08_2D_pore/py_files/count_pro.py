@@ -1,46 +1,24 @@
-import subprocess
 import os
-import pandas as pd
-import sys
-
-sys.path.append('/home/tpopova/prj/PB_SCF/08_2D_pore/py_files')
+import subprocess
+import shutil
+import logging
+from config_loader import load_config
 from generate_in_file import generate_in_file
 
-def count_pro(
-    range_param: str = 'Cs',
-    min_val: float = 0.5,
-    max_val: float = 0.5,
-    output_dir="2D_pore_in_files",  # Каталог для сохранения файлов
-    target_dir="/home/tpopova/prj/PB_SCF/08_2D_pore/scf_templates",  # Путь для перемещения
-    D=40,
-    L_pore=80,
-    L_wall=20,
-    space=10,
-    N=80,
-    S=100,
-    Cs=0.005,
-    valence=-0.5,
-    chi_surf=-0.55,
-    chi_solv=0.5
-):
-    # Генерирую in файл
-    file_in_path = generate_in_file(
-        output_dir=output_dir,
-        target_dir=target_dir,
-        D=D,
-        L_pore=L_pore,
-        L_wall=L_wall,
-        space=space,
-        N=N,
-        S=S,
-        Cs=Cs,
-        valence=valence,
-        chi_surf=chi_surf,
-        chi_solv=chi_solv
-    )
+config = load_config()
+
+def count_pro(range_param, min_val, max_val, output_dir, target_dir, D, L_pore, L_wall,
+              space, N, S, Cs, valence, chi_surf, chi_solv):
+    
+    # Генерация in файла
+    file_in_path = generate_in_file(**config)
     
     # Запуск NAMICS
-    subprocess.call(['namics', os.path.abspath(file_in_path)])
+    try:
+        subprocess.check_call(['namics', os.path.abspath(file_in_path)])
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Ошибка при выполнении NAMICS: {e}")
+        raise
     
     # Создание папки для вывода
     folder_name_out = f'2Dout_{range_param}_{min_val}_to_{max_val}'.replace('.', '_')
