@@ -5,10 +5,10 @@ import logging
 from config_loader import load_config
 from generate_in_file import generate_in_file
 
-config = load_config()
-
 def count_pro(range_param, min_val, max_val, output_dir, target_dir, D, L_pore, L_wall,
               space, N, S, Cs, valence, chi_surf, chi_solv):
+    
+    config = load_config()
     
     # Генерация in файла
     file_in_path = generate_in_file(**config)

@@ -33,7 +33,7 @@ def generate_in_file(
     theta = 2 * pi * D * N * (1 / S)
 
     # Генерация имени файла
-    base_filename = f"2D_v_{valence}_D_{D}_N_{N}_theta_{theta:.2f}.in"
+    base_filename = f"2D_Cs_{Cs:.4f}_L{L_pore:.1f}_L_wall_{L_wall:.1f}_space_{space:.1f}_v_{valence:.2f}_D_{D}_N_{N}_theta_{theta:.2f}.in"
     base_filename = base_filename.replace('.', '_', base_filename.count('.') - 1)
 
     # Путь к файлу
