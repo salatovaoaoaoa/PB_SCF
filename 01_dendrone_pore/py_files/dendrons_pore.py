@@ -25,7 +25,7 @@ def dendrons_pore(
     D : float = 200.0,
     
     #параметры дендрона
-    g : int = 1,
+    g : int = 0,
     q : int = 1,
     n_base : int = 10,
     N_opt : int = None,

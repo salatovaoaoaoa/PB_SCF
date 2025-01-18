@@ -27,9 +27,19 @@ def create_in(
     chi: float = 0.5,
     chi_ions: float = 0.5,
     chi_surf: float = -0.6,
+    
+    # epsilon: float = 80,
 ):
     theta_first_try = N_first_try / S
     theta = N / S
+    
+#     mon : W: epsilon : {epsilon}
+# mon : Na: epsilon : {epsilon}
+# mon : Cl: epsilon : {epsilon}
+
+# mon : X0: epsilon : {epsilon}
+# mon : A: epsilon : {epsilon}
+# mon : G: epsilon : {epsilon}
 
     # Контент для initial_cond = True
     content_true = f"""
@@ -65,8 +75,6 @@ mon : G : chi_Na : {chi_ions_first_try}
 mon : X0 : chi_Cl : {chi_ions_first_try}
 mon : A : chi_Cl : {chi_ions_first_try}
 mon : G : chi_Cl : {chi_ions_first_try}
-
-mon : W: epsilon : 80
 
 mon : X0 : valence : {alpha}
 mon : A : valence : {alpha}
@@ -166,8 +174,6 @@ mon : X0 : chi_Cl : {chi_ions}
 mon : A : chi_Cl : {chi_ions}
 mon : G : chi_Cl : {chi_ions}
 
-mon : W: epsilon : 80
-
 mon : X0 : valence : {alpha}
 mon : A : valence : {alpha}
 mon : G : valence : {alpha}
@@ -213,7 +219,6 @@ newton : isaac : deltamax : 0.1
     # Если alpha == 0, удаляем определенные строки
     if alpha == 0:
         lines_to_remove = [
-            f'mon : W: epsilon : 80\n',
             f'lat : flat : bondlength : {Kuhn}\n',
             f'mon : X0 : chi_Na : {chi}\n',
             f'mon : A : chi_Na : {chi}\n',
