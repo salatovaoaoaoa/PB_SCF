@@ -133,10 +133,13 @@ output : pro : append : false
 output : pro : write_bounds : false
 
 pro : sys : noname : psi
+pro : sys : noname : q
 pro : mol : brush : phi
 pro : mon : G : phi
 pro : mol : Na : phi
 pro : mol : Cl : phi
+pro : mol : water : phi
+
 """
 
     # Контент для initial_cond = False
@@ -202,10 +205,12 @@ output : pro : append : false
 output : pro : write_bounds : false
 
 pro : sys : noname : psi
+pro : sys : noname : q
 pro : mol : brush : phi
 pro : mon : G : phi
 pro : mol : Na : phi
 pro : mol : Cl : phi
+pro : mol : water : phi
 
 newton : isaac : method : pseudohessian
 newton : isaac : iterationlimit : 10000000

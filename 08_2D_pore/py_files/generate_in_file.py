@@ -47,6 +47,22 @@ lat : cyl : gradients : 2
 lat : cyl : lattice_type : simple_cubic
 lat : cyl : n_layers_x : {int(D + L_wall)}
 lat : cyl : n_layers_y : {int(L_pore + 2 * space)}""")
+            
+            # Добавляю граничные условия для стенки коробки
+            file.write(f"""
+lat : cyl : upperbound_x : surface
+mon : UX : freedom : frozen
+mon : UX : frozen_range : upperbound_x""")
+            
+            # Добавляю граничные условия для боков коробки
+            file.write(f"""
+lat : cyl : lowerbound_y : surface
+mon : LY : freedom : frozen
+mon : LY : frozen_range : lowerbound_y
+
+lat : cyl : upperbound_y : surface
+mon : UY : freedom : frozen
+mon : UY : frozen_range : upperbound_y""")
 
             # Генерация блоков для монологов
             file.write(f"""
@@ -64,6 +80,9 @@ mon : E : freedom : free""")
             file.write(f"""
 mon : A : chi_S : {chi_surf}
 mon : E : chi_S : {chi_surf}
+
+mon : A : chi_LY : {chi_surf}
+mon : E : chi_UY : {chi_surf}
 
 mon : A : chi_W : {chi_solv}
 mon : E : chi_W : {chi_solv}""")
@@ -98,6 +117,9 @@ mol : pol{i} : theta : {theta}
 pro : mol : pol{i} : phi
 
 mon : X{i} : chi_S : {chi_surf}
+mon : X{i} : chi_UY : {chi_surf}
+mon : X{i} : chi_LY : {chi_surf}
+
 mon : X{i} : chi_W : {chi_solv}
 
 mon : X{i} : freedom : pinned
