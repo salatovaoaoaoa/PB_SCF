@@ -291,3 +291,7 @@ newton : isaac : deltamax : 0.1
 
     # Возвращаем путь к выходному файлу
     return new_file_path
+
+# mon : W : chi_S : {chi_surf}
+# mon : Na : chi_S : {chi_surf}
+# mon : Cl : chi_S : {chi_surf}
