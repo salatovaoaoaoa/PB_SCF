@@ -67,17 +67,19 @@ def save_config(config, config_path=None, root_dir="/home/tpopova/prj/PB_SCF/08_
 
 def update_config_param(config, param, value):
     """
-    Обновляет конкретный параметр в конфигурации.
+    Обновляет или добавляет конкретный параметр в конфигурации.
     
     :param config: Словарь с конфигурацией.
-    :param param: Ключ параметра, который нужно обновить.
+    :param param: Ключ параметра, который нужно обновить или добавить.
     :param value: Новое значение для параметра.
     :return: Обновлённая конфигурация.
     """
     if param in config:
         logging.info(f"Обновление параметра {param} на {value}")
-        config[param] = value
     else:
-        logging.warning(f"Параметр {param} не найден в конфигурации.")
+        logging.info(f"Добавление нового параметра {param} со значением {value}")
+    
+    config[param] = value
+    return config
     
     return config

@@ -5,7 +5,7 @@ import logging
 
 def generate_in_file(
     range_param, min_val, max_val, output_dir, target_dir, D, L_pore, L_wall, space,
-    N, S, Cs, valence, chi_surf, chi_solv
+    N, S, Cs, valence, chi_surf, chi_solv, epsilon_surf
 ):
     """
     Генерирует файл входных данных для NAMICS и сохраняет его в указанный каталог.
@@ -33,7 +33,7 @@ def generate_in_file(
     theta = 2 * pi * D * N * (1 / S)
 
     # Генерация имени файла
-    base_filename = f"2D_Cs_{Cs:.4f}_L{L_pore:.1f}_L_wall_{L_wall:.1f}_space_{space:.1f}_v_{valence:.2f}_D_{D}_N_{N}_theta_{theta:.2f}.in"
+    base_filename = f"2D_eps_{epsilon_surf}_Cs_{Cs:.4f}_L{L_pore:.1f}_L_wall_{L_wall:.1f}_space_{space:.1f}_v_{valence:.2f}_D_{D}_N_{N}_theta_{theta:.2f}.in"
     base_filename = base_filename.replace('.', '_', base_filename.count('.') - 1)
 
     # Путь к файлу
@@ -68,7 +68,8 @@ mon : UY : frozen_range : upperbound_y""")
             file.write(f"""
 //surface #2
 mon : S : freedom : frozen
-mon : S : frozen_range : {int(D + 1)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}""")
+mon : S : frozen_range : {int(D + 1)},{int(space + 1)};{int(D + L_wall)},{space + L_pore}
+mon : S: epsilon : {epsilon_surf}""")
             
             # Генерация блоков для молекул
             file.write(f"""
@@ -99,7 +100,7 @@ output : pro : write_bounds : false
 
 pro : mon : E : phi
 
-newton : isaac : method : pseudohessian
+newton : isaac : method : DIIS
 newton : isaac : iterationlimit : 10000000
 newton : isaac : tolerance : 1e-8
 newton : isaac : deltamax : 0.1
