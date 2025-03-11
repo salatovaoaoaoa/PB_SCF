@@ -8,6 +8,7 @@
         "./charge_surf_2disp/py_files",
         "./charge_surface/py_files",
         "./01_dendrone_pore/py_files",
-        "./08_2D_pore/py_files"
+        "./08_2D_pore/py_files",
+        "./09_annealing_brush/py_files"
     ]
 }
